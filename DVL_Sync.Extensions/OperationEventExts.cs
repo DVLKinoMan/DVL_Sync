@@ -1,4 +1,6 @@
-﻿using DVL_Sync_FileEventsLogger.Models;
+﻿using DVL_Sync.Abstractions;
+using DVL_Sync.Models;
+using DVL_Sync_FileEventsLogger.Models;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -56,6 +58,14 @@ namespace DVL_Sync.Extensions
                     foreach (var operationsList in dic.Where(p => p.Key.IndexOf(pair.Key) == 0).Select(p => p.Value))
                         operationsList.RemoveAll(op => op.RaisedTime <= deletedTime);
             }
+
+            return filteredOperations;
+        }
+
+        public static IEnumerable<Operation> GetOperations(this IEnumerable<OperationEvent> operationEvents, IOperationFactory<OperationEvent> factory)
+        {
+            foreach (var operationEvent in operationEvents)
+                yield return factory.CreateOperation(operationEvent);
         }
     }
 }
