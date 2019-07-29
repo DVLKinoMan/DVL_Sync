@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="1.3.2" />
+    <PackageReference Include="MSTest.TestFramework" Version="1.3.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DVL_Sync.Extensions\DVL_Sync.Extensions.csproj" />
+    <ProjectReference Include="..\DVL_Sync.Implementations\DVL_Sync.Implementations.csproj" />
+    <ProjectReference Include="..\DVL_Sync.Models\DVL_Sync.Models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DVL_Sync_FileEventsLogger.Models">
+      <HintPath>..\..\DVL_Sync_FileEventsLogger\DVL_Sync_FileEventsLogger.Models\bin\Debug\netstandard2.0\DVL_Sync_FileEventsLogger.Models.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

@@ -29,7 +29,7 @@ namespace DVL_Sync.Extensions
                     continue;
                 }
 
-                if (!dic.TryAdd(filOp.FilePath, new List<OperationEvent> {filOp}))
+                if (!dic.TryAdd(filOp.FilePath, new List<OperationEvent> { filOp }))
                     dic[filOp.FilePath].Add(filOp);
 
             }
@@ -51,7 +51,12 @@ namespace DVL_Sync.Extensions
 
                 //If Create Event Presents All Edit Events Will be Deleted (In this Situation I need Copy of this File Already)
                 if (createEventIndex >= 0)
+                {
+                    var last = pair.Value.Where(p => p.EventType == EventType.Edit).Last();
+                    if (last != null)
+                        pair.Value[createEventIndex].RaisedTime = last.RaisedTime;
                     pair.Value.RemoveAll(p => p.EventType == EventType.Edit);
+                }
 
                 //If Directory was Deleted
                 if (pair.Value.Any(p => p.FileType == FileType.Directory) && deletedTime != null)

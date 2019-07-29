@@ -12,7 +12,7 @@ namespace DVL_Sync.Implementations
 
         public OperationFactoryViaOperationEvent(string folderRootPath)
         {
-            this._folderRootPath = folderRootPath;
+            _folderRootPath = folderRootPath;
         }
 
         public Operation CreateOperation(OperationEvent opEvent) => opEvent switch

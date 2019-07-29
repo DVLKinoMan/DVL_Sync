@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28729.10
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DVL_Sync.Abstractions", "DVL_Sync.Abstractions\DVL_Sync.Abstractions.csproj", "{9A5E9299-E852-4BB3-B37E-A068191CA1BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DVL_Sync.Abstractions", "DVL_Sync.Abstractions\DVL_Sync.Abstractions.csproj", "{9A5E9299-E852-4BB3-B37E-A068191CA1BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DVL_Sync.Models", "DVL_Sync.Models\DVL_Sync.Models.csproj", "{7CDF3BE6-D19B-427E-B9E6-5B4A98F99894}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DVL_Sync.Models", "DVL_Sync.Models\DVL_Sync.Models.csproj", "{7CDF3BE6-D19B-427E-B9E6-5B4A98F99894}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DVL_Sync.Implementations", "DVL_Sync.Implementations\DVL_Sync.Implementations.csproj", "{4E02978A-23E5-4021-82FA-9C0ADEEBEDC7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DVL_Sync.Implementations", "DVL_Sync.Implementations\DVL_Sync.Implementations.csproj", "{4E02978A-23E5-4021-82FA-9C0ADEEBEDC7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DVL_Sync.Extensions", "DVL_Sync.Extensions\DVL_Sync.Extensions.csproj", "{88549A1F-2399-4F5D-82F1-B0220E6C9621}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DVL_Sync.Extensions", "DVL_Sync.Extensions\DVL_Sync.Extensions.csproj", "{88549A1F-2399-4F5D-82F1-B0220E6C9621}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DVL_Sync.Tester", "DVL_Sync.Tester\DVL_Sync.Tester.csproj", "{895E193E-DAA5-4E94-B348-25B74FBBCA96}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{88549A1F-2399-4F5D-82F1-B0220E6C9621}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{88549A1F-2399-4F5D-82F1-B0220E6C9621}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{88549A1F-2399-4F5D-82F1-B0220E6C9621}.Release|Any CPU.Build.0 = Release|Any CPU
+		{895E193E-DAA5-4E94-B348-25B74FBBCA96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{895E193E-DAA5-4E94-B348-25B74FBBCA96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{895E193E-DAA5-4E94-B348-25B74FBBCA96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{895E193E-DAA5-4E94-B348-25B74FBBCA96}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
