@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using File.Extensions;
+using System.IO;
+using SystemIOFile = System.IO.File;
 
 namespace DVL_Sync.Models
 {
@@ -19,7 +21,7 @@ namespace DVL_Sync.Models
         /// Deletes File in folderPath which is located from root with FilePathFromRoot
         /// </summary>
         /// <param name="folderPath"></param>
-        public override void Execute(string folderPath) => File.Delete(Path.Combine(folderPath, FilePathFromRoot));
+        public override void Execute(string folderPath) => SystemIOFile.Delete(Path.Combine(folderPath, FilePathFromRoot));
     }
 
     public class CopyOperation : Operation
@@ -30,7 +32,7 @@ namespace DVL_Sync.Models
         /// Copys File to folderPath
         /// </summary>
         /// <param name="folderPath"></param>
-        public override void Execute(string folderPath) => File.Copy(FilePathToCopy, folderPath, true);
+        public override void Execute(string folderPath) => CustomFile.CopyToFolder(FilePathToCopy, folderPath, true);
     }
 
     public class RenameOperation : Operation
@@ -42,6 +44,6 @@ namespace DVL_Sync.Models
         /// Renames File which is in folderPath directory
         /// </summary>
         /// <param name="folderPath"></param>
-        public override void Execute(string folderPath) => File.Move(Path.Combine(folderPath, FilePathFromRoot), NewName);
+        public override void Execute(string folderPath) => SystemIOFile.Move(Path.Combine(folderPath, FilePathFromRoot), NewName);
     }
 }

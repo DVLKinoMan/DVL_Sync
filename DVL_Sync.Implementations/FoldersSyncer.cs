@@ -27,11 +27,11 @@ namespace DVL_Sync.Implementations
             //Remove OperationEvents from both Lists
             FilterOperationEvents(folderConfig1List, folderConfig1.FolderPath, folderConfig2List, folderConfig2.FolderPath);
 
-            var operationFactory = new OperationFactoryViaOperationEvent(folderConfig1.FolderPath);
-            folderConfig1List.GetOperations(operationFactory).ExecuteAll(folderConfig1.FolderPath);
+            var operationFactory = new OperationFactoryViaOperationEvent(folderConfig2.FolderPath);
+            folderConfig1List.GetOperations(operationFactory).ExecuteAll(folderConfig2.FolderPath);
 
-            var operationFactory2 = new OperationFactoryViaOperationEvent(folderConfig2.FolderPath);
-            folderConfig2List.GetOperations(operationFactory2).ExecuteAll(folderConfig2.FolderPath);
+            var operationFactory2 = new OperationFactoryViaOperationEvent(folderConfig1.FolderPath);
+            folderConfig2List.GetOperations(operationFactory2).ExecuteAll(folderConfig1.FolderPath);
         }
 
         private static void FilterOperationEvents(List<OperationEvent> operationEvents1, string folderPath1, List<OperationEvent> operationEvents2, string folderPath2)
