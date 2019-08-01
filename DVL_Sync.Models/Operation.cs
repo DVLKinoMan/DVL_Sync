@@ -13,6 +13,17 @@ namespace DVL_Sync.Models
         public abstract void Execute(string folderPath);
     }
 
+    public class CreateDirectoryOperation : Operation
+    {
+        public string DirectoryPathFromRoot { get; set; }
+
+        /// <summary>
+        /// Create Directory in folderPath
+        /// </summary>
+        /// <param name="folderPath"></param>
+        public override void Execute(string folderPath) => Directory.CreateDirectory(Path.Combine(folderPath, DirectoryPathFromRoot));
+    }
+
     public class DeleteOperation : Operation
     {
         public string FilePathFromRoot { get; set; }

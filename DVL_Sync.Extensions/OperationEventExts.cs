@@ -5,7 +5,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace DVL_Sync.Extensions
 {
@@ -19,7 +18,7 @@ namespace DVL_Sync.Extensions
         public static IEnumerable<OperationEvent> FilteredOperationEvents(
             this IEnumerable<OperationEvent> operationEvents)
         {
-            var filteredOperations = operationEvents.Where(opEvent => !(opEvent.EventType == EventType.Edit && opEvent.FileType == FileType.Directory)).ToList();
+            var filteredOperations = operationEvents.Where(opEvent => !(opEvent.EventType == EventType.Edit && opEvent.FileType == FileType.Directory));
             var dic = new ConcurrentDictionary<string, List<OperationEvent>>();
             foreach (var filOp in filteredOperations)
             {
@@ -52,7 +51,7 @@ namespace DVL_Sync.Extensions
                 //If Create Event Presents All Edit Events Will be Deleted (In this Situation I need Copy of this File Already)
                 if (createEventIndex >= 0)
                 {
-                    var last = pair.Value.Where(p => p.EventType == EventType.Edit).Last();
+                    var last = pair.Value.Where(p => p.EventType == EventType.Edit).LastOrDefault();
                     if (last != null)
                         pair.Value[createEventIndex].RaisedTime = last.RaisedTime;
                     pair.Value.RemoveAll(p => p.EventType == EventType.Edit);
@@ -64,7 +63,7 @@ namespace DVL_Sync.Extensions
                         operationsList.RemoveAll(op => op.RaisedTime <= deletedTime);
             }
 
-            return filteredOperations;
+            return dic.SelectMany(p => p.Value).OrderBy(ev => ev.RaisedTime);
         }
 
         public static IEnumerable<Operation> GetOperations(this IEnumerable<OperationEvent> operationEvents, IOperationFactory<OperationEvent> factory)

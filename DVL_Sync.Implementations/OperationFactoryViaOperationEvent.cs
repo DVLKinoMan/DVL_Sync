@@ -17,12 +17,19 @@ namespace DVL_Sync.Implementations
 
         public Operation CreateOperation(OperationEvent opEvent) => opEvent switch
         {
+            CreateOperationEvent createOperationEvent when createOperationEvent.FileType == FileType.Directory => CreateDirectoryOperation(createOperationEvent),
             CreateOperationEvent createOperationEvent => CreateCopyOperation(createOperationEvent) as Operation,
             EditOperationEvent editOperationEvent => CreateCopyOperation(editOperationEvent),
             DeleteOperationEvent deleteOperationEvent => CreateDeleteOperation(deleteOperationEvent),
             RenameOperationEvent renameOperationEvent => CreateRenameOperation(renameOperationEvent),
             _ => throw new NotImplementedException("OperationEvent not implemented")
         };
+
+        private CreateDirectoryOperation CreateDirectoryOperation(CreateOperationEvent opEvent) =>
+            new CreateDirectoryOperation
+            {
+                DirectoryPathFromRoot = opEvent.FilePath.SubtractPath(_folderRootPath)
+            };
 
         private CopyOperation CreateCopyOperation(CreateOperationEvent opEvent) =>
             new CopyOperation

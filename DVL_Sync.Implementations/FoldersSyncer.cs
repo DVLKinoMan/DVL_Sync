@@ -27,11 +27,12 @@ namespace DVL_Sync.Implementations
             //Remove OperationEvents from both Lists
             FilterOperationEvents(folderConfig1List, folderConfig1.FolderPath, folderConfig2List, folderConfig2.FolderPath);
 
-            var operationFactory = new OperationFactoryViaOperationEvent(folderConfig2.FolderPath);
-            folderConfig1List.GetOperations(operationFactory).ExecuteAll(folderConfig2.FolderPath);
+            var operationFactory = new OperationFactoryViaOperationEvent(folderConfig1.FolderPath);
+            var ops = folderConfig1List.GetOperations(operationFactory);
+            ops.ExecuteAll(folderConfig2.FolderPath);
 
-            var operationFactory2 = new OperationFactoryViaOperationEvent(folderConfig1.FolderPath);
-            folderConfig2List.GetOperations(operationFactory2).ExecuteAll(folderConfig1.FolderPath);
+            var operationFactory2 = new OperationFactoryViaOperationEvent(folderConfig2.FolderPath);
+            folderConfig2List.GetOperations(operationFactory2).ExecuteAll(folderConfig2.FolderPath);
         }
 
         private static void FilterOperationEvents(List<OperationEvent> operationEvents1, string folderPath1, List<OperationEvent> operationEvents2, string folderPath2)
@@ -40,7 +41,8 @@ namespace DVL_Sync.Implementations
 
             void AddToDic(string folderPath, OperationEvent ev, bool inFirstList)
             {
-                string filePath = folderPath.SubtractPath(ev.FilePath);
+                string filePath = ev is RenameOperationEvent renOp ? renOp.OldFilePath.SubtractPath(folderPath) : ev.FilePath.SubtractPath(folderPath);
+
                 if (dic.ContainsKey(filePath))
                     dic[filePath].Add(ev);
                 else dic.Add(filePath, new List<OperationEvent> { ev });
@@ -54,7 +56,8 @@ namespace DVL_Sync.Implementations
 
             var neededOpEvents = new List<OperationEvent>();
             foreach(var pair in dic)
-                neededOpEvents.Add(pair.Value.OrderBy(t => t.RaisedTime).Last());
+                neededOpEvents.AddRange(pair.Value.FilteredOperationEvents());
+            //neededOpEvents.Add(pair.Value.OrderBy(t => t.RaisedTime).Last());
 
             operationEvents1.RemoveAll(op => !neededOpEvents.Contains(op));
             operationEvents2.RemoveAll(op => !neededOpEvents.Contains(op));
