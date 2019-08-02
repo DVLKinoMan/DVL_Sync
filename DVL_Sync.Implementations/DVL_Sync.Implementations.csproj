@@ -22,7 +22,7 @@
       <HintPath>..\..\DVL_Sync_FileEventsLogger\DVL_Sync_FileEventsLogger.Implementations\bin\Debug\netstandard2.0\DVL_Sync_FileEventsLogger.Models.dll</HintPath>
     </Reference>
     <Reference Include="System.Extensions">
-      <HintPath>..\..\DVL_Sync_FileEventsLogger\DVL_Sync_FileEventsLogger.Models\bin\Debug\netstandard2.0\System.Extensions.dll</HintPath>
+      <HintPath>..\..\DVL_Sync_FileEventsLogger\System.Extensions\bin\Debug\netstandard2.0\System.Extensions.dll</HintPath>
     </Reference>
   </ItemGroup>
 

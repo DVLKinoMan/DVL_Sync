@@ -35,6 +35,7 @@ namespace DVL_Sync.Implementations
             new CopyOperation
             {
                 FilePathToCopy = opEvent.FilePath,
+                FilePathFromRoot = opEvent.FilePath.SubtractPath(_folderRootPath)
                 //DirectoryPathToPaste = opEvent.
             };
 

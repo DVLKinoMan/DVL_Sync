@@ -48,12 +48,21 @@ namespace DVL_Sync.Extensions
                     else pair.Value.RemoveRange(0, lastDeleteEventIndex);
                 }
 
-                //If Create Event Presents All Edit Events Will be Deleted (In this Situation I need Copy of this File Already)
                 if (createEventIndex >= 0)
                 {
-                    var last = pair.Value.Where(p => p.EventType == EventType.Edit).LastOrDefault();
+                    //If Create Event Presents All Edit Events Will be Deleted (In this Situation I need Copy of this File Already)
+                    var last = pair.Value.LastOrDefault(p => p.EventType == EventType.Edit);
                     if (last != null)
                         pair.Value[createEventIndex].RaisedTime = last.RaisedTime;
+
+                    //If Rename happened I need Renamed FilePath, because CopyOperation will not work on Previous FilePath
+                    var lastRename = pair.Value.LastOrDefault(p => p.EventType == EventType.Rename);
+                    if (lastRename != null)
+                    {
+                        pair.Value[createEventIndex].FilePath = lastRename.FilePath;
+                        pair.Value.RemoveAll(p => p.EventType == EventType.Rename);
+                    }
+
                     pair.Value.RemoveAll(p => p.EventType == EventType.Edit);
                 }
 

@@ -1,5 +1,4 @@
-﻿using File.Extensions;
-using System.IO;
+﻿using System.IO;
 using SystemIOFile = System.IO.File;
 
 namespace DVL_Sync.Models
@@ -38,12 +37,13 @@ namespace DVL_Sync.Models
     public class CopyOperation : Operation
     {
         public string FilePathToCopy { get; set; }
+        public string FilePathFromRoot { get; set; }
 
         /// <summary>
         /// Copys File to folderPath
         /// </summary>
         /// <param name="folderPath"></param>
-        public override void Execute(string folderPath) => CustomFile.CopyToFolder(FilePathToCopy, folderPath, true);
+        public override void Execute(string folderPath) => SystemIOFile.Copy(FilePathToCopy, Path.Combine(folderPath, FilePathFromRoot), true);
     }
 
     public class RenameOperation : Operation
