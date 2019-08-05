@@ -10,6 +10,13 @@ namespace DVL_Sync.Extensions
 {
     public static class OperationEventExts
     {
+        public class OperationsTree
+        {
+            //public string val { get { return @event.} }
+            public OperationEvent @event { get; set; }
+            public List<OperationsTree> childsTree { get; set; }
+        }
+
         /// <summary>
         /// 
         /// </summary>
