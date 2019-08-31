@@ -14,13 +14,13 @@ namespace DVL_Sync.Tester
             var sync = new FoldersSyncer(folderOperationEventsReader);
             sync.SyncFolders(new FolderConfig
             {
-                FolderPath = "D:\\DVL_Sync_WatcherTestingFile",
+                FolderPath = "D:\\New Folder",
                 IncludeSubDirectories = true,
                 WatchHiddenFiles = false
             },
             new FolderConfig
             {
-                FolderPath = "D:\\DVL_Sync_WatcherTestingFile2",
+                FolderPath = "D:\\New Folder (2)",
                 IncludeSubDirectories = true,
                 WatchHiddenFiles = false
             });
