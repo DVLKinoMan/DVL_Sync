@@ -103,13 +103,19 @@ namespace DVL_Sync.Extensions
 
         public static string GetRootPath(this IEnumerable<OperationEvent> operationEvents)
         {
-            var splitted = operationEvents.First().FilePath.Split(new[] {"\\"}, StringSplitOptions.None);
-            string split = splitted[0];
-            int i = 2;
-            while (i <= splitted.Length && operationEvents.All(op => op.FilePath.Contains(split)))
-                split = string.Join("\\", splitted.Take(i++));
+            if (operationEvents.Count() == 0)
+                throw new NullReferenceException("Sequence doesn't contain elements");
 
-            return string.Join("\\", splitted.Take(i - 1));
+            var splitted = operationEvents.First().FilePath.Split(new[] {"\\"}, StringSplitOptions.None);
+            string split = string.Empty;
+            int i = 1;
+            while (i <= splitted.Length && !IsFile(splitted[i-1]) && operationEvents.All(op => op.FilePath.Contains(GetJoinedString(i))))
+                split = GetJoinedString(i++);
+
+            return split;
+
+            string GetJoinedString(int k) => string.Join("\\", splitted.Take(k));
+            bool IsFile(string splittedEl) => splittedEl.Contains(".txt") || splittedEl.Contains(".json");
         }
 
         public static IEnumerable<OperationEvent> GetOperationEventsFromRootFolderViewModel(
