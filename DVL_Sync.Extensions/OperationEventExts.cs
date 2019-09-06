@@ -26,7 +26,12 @@ namespace DVL_Sync.Extensions
         public static IEnumerable<OperationEvent> FilteredOperationEvents(
             this IEnumerable<OperationEvent> operationEvents)
         {
-            var filteredOperations = operationEvents.Where(opEvent => !(opEvent.EventType == EventType.Edit && opEvent.FileType == FileType.Directory)).OrderBy(opEvent=>opEvent.RaisedTime);
+            var filteredOperations = operationEvents
+                                                    .Where(opEvent => !(opEvent.EventType == EventType.Edit && opEvent.FileType == FileType.Directory))
+                                                    .OrderBy(opEvent=>opEvent.RaisedTime);
+
+            if (filteredOperations == null || filteredOperations.Count() == 0)
+                return filteredOperations;
 
             var rootFolder =  new FolderViewModel(filteredOperations.GetRootPath());
 
@@ -101,10 +106,19 @@ namespace DVL_Sync.Extensions
                 yield return factory.CreateOperation(operationEvent);
         }
 
+        /// <summary>
+        /// Get's root folder path for all operationEvents
+        /// </summary>
+        /// <param name="operationEvents"></param>
+        /// <returns></returns>
+        /// <exception cref="System.NullReferenceException">description</exception>
+        /// <exception cref="System.InvalidOperationException">description</exception>
         public static string GetRootPath(this IEnumerable<OperationEvent> operationEvents)
         {
+            if (operationEvents == null)
+                throw new NullReferenceException("Object reference not set to an instance of an object (operationEvents");
             if (operationEvents.Count() == 0)
-                throw new NullReferenceException("Sequence doesn't contain elements");
+                throw new InvalidOperationException("Sequence contains no elements");
 
             var splitted = operationEvents.First().FilePath.Split(new[] {"\\"}, StringSplitOptions.None);
             string split = string.Empty;
@@ -130,7 +144,7 @@ namespace DVL_Sync.Extensions
             foreach (var file in rootFolder.Files)
                 yield return RefactorOperationEvent(file.OperationEvent);
 
-            if (rootFolder.OperationEvent != null && !(rootFolder.OperationEvent is DeleteOperationEvent))
+            if (!(rootFolder.OperationEvent is DeleteOperationEvent))
             {
                 foreach (var folder in rootFolder.Folders)
                 foreach (var opEvent in folder.GetOperationEventsFromRootFolderViewModel(Path.Combine(path, folder.Name)))
@@ -144,10 +158,14 @@ namespace DVL_Sync.Extensions
             }
         }
 
-        public static void AddFileToRootFolder(this FolderViewModel rootFolder, OperationEvent opEvent)
+        public static bool AddFileToRootFolder(this FolderViewModel rootFolder, OperationEvent opEvent)
         {
             var currFolder = rootFolder;
-            var splitted = opEvent.FilePath.Split(new[] {"\\"}, StringSplitOptions.None);
+            var splitted = SplitWithSlashes(opEvent.FilePath);
+
+            if (SplitWithSlashes(rootFolder.Name)[0] != splitted[0])
+                return false;
+
             for (int i = 1; i < splitted.Length - 1; i++)
             {
                 var fold = currFolder.Folders.FirstOrDefault(folder => folder.Name == splitted[i]);
@@ -161,31 +179,47 @@ namespace DVL_Sync.Extensions
 
             string fileName = splitted[splitted.Length - 1];
             var file = currFolder.Files.FirstOrDefault(fl => fl.Name == fileName);
-            if (file == null)
-                currFolder.Files.Add(new FileViewModel(fileName) {OperationEvent = opEvent});
+            if (opEvent is RenameOperationEvent renOpEvent)
+            {
+                currFolder.Files.RemoveAll(fl => fl.Name == renOpEvent.OldFileName);
+                currFolder.Files.Add(new FileViewModel(fileName) { OperationEvent = opEvent });
+            }
             else
             {
-                switch (opEvent)
+                if (file == null)
+                    currFolder.Files.Add(new FileViewModel(fileName) { OperationEvent = opEvent });
+                else
                 {
-                    case RenameOperationEvent renOpEvent:
-                        file.Name = renOpEvent.FileName;
-                        file.OperationEvent = renOpEvent;
-                        break;
-                    case EditOperationEvent editOpEvent:
-                        file.OperationEvent = editOpEvent;
-                        break;
-                    case DeleteOperationEvent deleteOpEvent:
-                        file.OperationEvent = deleteOpEvent;
-                        break;
-                    default: throw new NotImplementedException("CreateOperationEvent not implemented");
+                    switch (opEvent)
+                    {
+                        //case RenameOperationEvent renOpEvent:
+                        //    file.Name = renOpEvent.FileName;
+                        //    file.OperationEvent = renOpEvent;
+                        //    break;
+                        case EditOperationEvent editOpEvent:
+                            file.OperationEvent = editOpEvent;
+                            break;
+                        case DeleteOperationEvent deleteOpEvent:
+                            file.OperationEvent = deleteOpEvent;
+                            break;
+                        default: throw new NotImplementedException("CreateOperationEvent not implemented");
+                    }
                 }
             }
+
+            return true;
+
+            string[] SplitWithSlashes(string str) => str.Split(new[] { "\\" }, StringSplitOptions.None);
         }
 
-        public static void AddFolderToRootFolder(this FolderViewModel rootFolder, OperationEvent opEvent)
+        public static bool AddFolderToRootFolder(this FolderViewModel rootFolder, OperationEvent opEvent)
         {
             var currFolder = rootFolder;
-            var splitted = opEvent.FilePath.Split(new[] { "\\" }, StringSplitOptions.None);
+            var splitted = SplitWithSlashes(opEvent.FilePath);
+
+            if (SplitWithSlashes(rootFolder.Name)[0] != splitted[0])
+                return false;
+
             for (int i = 1; i < splitted.Length - 1; i++)
             {
                 var fold = currFolder.Folders.FirstOrDefault(f => f.Name == splitted[i]);
@@ -199,22 +233,38 @@ namespace DVL_Sync.Extensions
 
             string folderName = splitted[splitted.Length - 1];
             var folder = currFolder.Folders.FirstOrDefault(fold => fold.Name == folderName);
-            if (folder == null)
-                currFolder.Folders.Add(new FolderViewModel(folderName) { OperationEvent = opEvent });
-            else
+            if (opEvent is RenameOperationEvent renOpEvent)
             {
-                switch (opEvent)
+                var oldFolder = currFolder.Folders.FirstOrDefault(fold => fold.Name == renOpEvent.OldFileName);
+                if (oldFolder != null)
                 {
-                    case RenameOperationEvent renOpEvent:
-                        folder.Name = renOpEvent.FileName;
-                        folder.OperationEvent = renOpEvent;
-                        break;
-                    case DeleteOperationEvent deleteOpEvent:
-                        folder.OperationEvent = deleteOpEvent;
-                        break;
-                    default: throw new NotImplementedException("CreateOperationEvent or EditOperationEvent not implemented");
+                    oldFolder.Name = folderName;
+                    oldFolder.OperationEvent = opEvent;
                 }
             }
+            else
+            {
+                if (folder == null)
+                    currFolder.Folders.Add(new FolderViewModel(folderName) { OperationEvent = opEvent });
+                else
+                {
+                    switch (opEvent)
+                    {
+                        //case RenameOperationEvent renOpEvent:
+                        //    folder.Name = renOpEvent.FileName;
+                        //    folder.OperationEvent = renOpEvent;
+                        //    break;
+                        case DeleteOperationEvent deleteOpEvent:
+                            folder.OperationEvent = deleteOpEvent;
+                            break;
+                        default: throw new NotImplementedException("CreateOperationEvent or EditOperationEvent not implemented");
+                    }
+                }
+            }
+
+            return true;
+
+            string[] SplitWithSlashes(string str) => str.Split(new[] { "\\" }, StringSplitOptions.None);
         }
     }
 }
