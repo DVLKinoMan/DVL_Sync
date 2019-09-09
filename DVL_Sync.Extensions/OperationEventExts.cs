@@ -139,7 +139,7 @@ namespace DVL_Sync.Extensions
                 path = rootFolder.Name;
 
             if (rootFolder.OperationEvent != null)
-                yield return RefactorOperationEvent(rootFolder.OperationEvent);
+                yield return RefactorOperationEvent(rootFolder.OperationEvent, true);
 
             foreach (var file in rootFolder.Files)
                 yield return RefactorOperationEvent(file.OperationEvent);
@@ -151,9 +151,12 @@ namespace DVL_Sync.Extensions
                     yield return opEvent;
             }
 
-            OperationEvent RefactorOperationEvent(OperationEvent opEvent)
+            OperationEvent RefactorOperationEvent(OperationEvent opEvent, bool isRootFolderEvent = false)
             {
-                opEvent.FilePath = Path.Combine(path, opEvent.FileName);
+                if (!isRootFolderEvent)
+                    opEvent.FilePath = Path.Combine(path, opEvent.FileName);
+                else opEvent.FilePath = path;
+
                 return opEvent;
             }
         }
@@ -163,10 +166,10 @@ namespace DVL_Sync.Extensions
             var currFolder = rootFolder;
             var splitted = SplitWithSlashes(opEvent.FilePath);
 
-            if (SplitWithSlashes(rootFolder.Name)[0] != splitted[0])
+            if (rootFolder.Name != opEvent.FilePath.Substring(0, rootFolder.Name.Length))
                 return false;
 
-            for (int i = 1; i < splitted.Length - 1; i++)
+            for (int i = SplitWithSlashes(rootFolder.Name).Length; i < splitted.Length - 1; i++)
             {
                 var fold = currFolder.Folders.FirstOrDefault(folder => folder.Name == splitted[i]);
                 if (fold == null)
@@ -217,10 +220,10 @@ namespace DVL_Sync.Extensions
             var currFolder = rootFolder;
             var splitted = SplitWithSlashes(opEvent.FilePath);
 
-            if (SplitWithSlashes(rootFolder.Name)[0] != splitted[0])
+            if (rootFolder.Name != opEvent.FilePath.Substring(0, rootFolder.Name.Length))
                 return false;
 
-            for (int i = 1; i < splitted.Length - 1; i++)
+            for (int i = SplitWithSlashes(rootFolder.Name).Length; i < splitted.Length - 1; i++)
             {
                 var fold = currFolder.Folders.FirstOrDefault(f => f.Name == splitted[i]);
                 if (fold == null)
@@ -241,6 +244,7 @@ namespace DVL_Sync.Extensions
                     oldFolder.Name = folderName;
                     oldFolder.OperationEvent = opEvent;
                 }
+                else currFolder.Folders.Add(new FolderViewModel(folderName) { OperationEvent = opEvent });
             }
             else
             {

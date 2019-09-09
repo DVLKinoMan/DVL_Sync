@@ -206,7 +206,7 @@ namespace DVL_Sync.Tester
         {
             var rootFolder = CreateChainOfFolders("D:", "Folder1", "InsideFolder1", "InsideInsideFolder1");
             string folderPath = @"D:\Folder1\InsideFolder1\InsideInsideFolder1\SomeNewFolder";
-            rootFolder.AddFolderToRootFolder(new RenameOperationEvent { FilePath = folderPath });
+            rootFolder.AddFolderToRootFolder(new RenameOperationEvent { FilePath = folderPath, OldFilePath = @"D:\Folder1\InsideFolder1\InsideInsideFolder1\SomeOldFolderName" });
             Assert.AreEqual(true, ContainsFolderInPath(rootFolder, folderPath));
         }
 
@@ -215,7 +215,7 @@ namespace DVL_Sync.Tester
         {
             var rootFolder = CreateChainOfFolders("D:", "Folder1", "InsideFolder1", "InsideInsideFolder1");
             string folderPath = @"D:\Folder1\SomeNewFolder";
-            rootFolder.AddFolderToRootFolder(new RenameOperationEvent { FilePath = folderPath });
+            rootFolder.AddFolderToRootFolder(new RenameOperationEvent { FilePath = folderPath, OldFilePath = "" });
             Assert.AreEqual(true, ContainsFolderInPath(rootFolder, folderPath));
         }
 
