@@ -30,7 +30,7 @@ namespace DVL_Sync.Extensions
                                                     .Where(opEvent => !(opEvent.EventType == EventType.Edit && opEvent.FileType == FileType.Directory))
                                                     .OrderBy(opEvent=>opEvent.RaisedTime);
 
-            if (filteredOperations == null || filteredOperations.Count() == 0)
+            if (filteredOperations == null || filteredOperations.Count() <= 1)
                 return filteredOperations;
 
             var rootFolder =  new FolderViewModel(filteredOperations.GetRootPath());
@@ -44,60 +44,60 @@ namespace DVL_Sync.Extensions
 
             return rootFolder.GetOperationEventsFromRootFolderViewModel().OrderBy(opEvent => opEvent.RaisedTime);
 
-            var dic = new Dictionary<string, List<OperationEvent>>();
-            foreach (var filOp in filteredOperations)
-            {
-                if (filOp is RenameOperationEvent renameOp && dic.ContainsKey(renameOp.OldFilePath))
-                {
-                    dic[renameOp.OldFilePath].Add(filOp);
-                    continue;
-                }
+            //var dic = new Dictionary<string, List<OperationEvent>>();
+            //foreach (var filOp in filteredOperations)
+            //{
+            //    if (filOp is RenameOperationEvent renameOp && dic.ContainsKey(renameOp.OldFilePath))
+            //    {
+            //        dic[renameOp.OldFilePath].Add(filOp);
+            //        continue;
+            //    }
 
-                if (dic.ContainsKey(filOp.FilePath))
-                    dic[filOp.FilePath].Add(filOp);
-                else dic.Add(filOp.FilePath, new List<OperationEvent> {filOp});
-            }
+            //    if (dic.ContainsKey(filOp.FilePath))
+            //        dic[filOp.FilePath].Add(filOp);
+            //    else dic.Add(filOp.FilePath, new List<OperationEvent> {filOp});
+            //}
 
-            foreach (var pair in dic)
-            {
-                //Deleting Redundant Events Before Delete Event
-                int createEventIndex = pair.Value.FindIndex(op => op.EventType == EventType.Create);
-                int firstDeleteEventIndex = pair.Value.FindIndex(op => op.EventType == EventType.Delete);
-                int lastDeleteEventIndex = pair.Value.FindLastIndex(op => op.EventType == EventType.Delete);
-                DateTime? deletedTime = null;
-                if (lastDeleteEventIndex >= 0)
-                {
-                    deletedTime = pair.Value[lastDeleteEventIndex].RaisedTime;
-                    if (createEventIndex < firstDeleteEventIndex && createEventIndex >= 0)
-                        pair.Value.RemoveRange(0, lastDeleteEventIndex + 1);
-                    else pair.Value.RemoveRange(0, lastDeleteEventIndex);
-                }
+            //foreach (var pair in dic)
+            //{
+            //    //Deleting Redundant Events Before Delete Event
+            //    int createEventIndex = pair.Value.FindIndex(op => op.EventType == EventType.Create);
+            //    int firstDeleteEventIndex = pair.Value.FindIndex(op => op.EventType == EventType.Delete);
+            //    int lastDeleteEventIndex = pair.Value.FindLastIndex(op => op.EventType == EventType.Delete);
+            //    DateTime? deletedTime = null;
+            //    if (lastDeleteEventIndex >= 0)
+            //    {
+            //        deletedTime = pair.Value[lastDeleteEventIndex].RaisedTime;
+            //        if (createEventIndex < firstDeleteEventIndex && createEventIndex >= 0)
+            //            pair.Value.RemoveRange(0, lastDeleteEventIndex + 1);
+            //        else pair.Value.RemoveRange(0, lastDeleteEventIndex);
+            //    }
 
-                if (createEventIndex >= 0)
-                {
-                    //If Create Event Presents All Edit Events Will be Deleted (In this Situation I need Copy of this File Already)
-                    var last = pair.Value.LastOrDefault(p => p.EventType == EventType.Edit);
-                    if (last != null)
-                        pair.Value[createEventIndex].RaisedTime = last.RaisedTime;
+            //    if (createEventIndex >= 0)
+            //    {
+            //        //If Create Event Presents All Edit Events Will be Deleted (In this Situation I need Copy of this File Already)
+            //        var last = pair.Value.LastOrDefault(p => p.EventType == EventType.Edit);
+            //        if (last != null)
+            //            pair.Value[createEventIndex].RaisedTime = last.RaisedTime;
 
-                    //If Rename happened I need Renamed FilePath, because CopyOperation will not work on Previous FilePath
-                    var lastRename = pair.Value.LastOrDefault(p => p.EventType == EventType.Rename);
-                    if (lastRename != null)
-                    {
-                        pair.Value[createEventIndex].FilePath = lastRename.FilePath;
-                        pair.Value.RemoveAll(p => p.EventType == EventType.Rename);
-                    }
+            //        //If Rename happened I need Renamed FilePath, because CopyOperation will not work on Previous FilePath
+            //        var lastRename = pair.Value.LastOrDefault(p => p.EventType == EventType.Rename);
+            //        if (lastRename != null)
+            //        {
+            //            pair.Value[createEventIndex].FilePath = lastRename.FilePath;
+            //            pair.Value.RemoveAll(p => p.EventType == EventType.Rename);
+            //        }
 
-                    pair.Value.RemoveAll(p => p.EventType == EventType.Edit);
-                }
+            //        pair.Value.RemoveAll(p => p.EventType == EventType.Edit);
+            //    }
 
-                //If Directory was Deleted
-                if (pair.Value.Any(p => p.FileType == FileType.Directory) && deletedTime != null)
-                    foreach (var operationsList in dic.Where(p => p.Key.IndexOf(pair.Key) == 0).Select(p => p.Value))
-                        operationsList.RemoveAll(op => op.RaisedTime <= deletedTime);
-            }
+            //    //If Directory was Deleted
+            //    if (pair.Value.Any(p => p.FileType == FileType.Directory) && deletedTime != null)
+            //        foreach (var operationsList in dic.Where(p => p.Key.IndexOf(pair.Key) == 0).Select(p => p.Value))
+            //            operationsList.RemoveAll(op => op.RaisedTime <= deletedTime);
+            //}
 
-            return dic.SelectMany(p => p.Value).OrderBy(ev => ev.RaisedTime);
+            //return dic.SelectMany(p => p.Value).OrderBy(ev => ev.RaisedTime);
         }
 
         public static IEnumerable<Operation> GetOperations(this IEnumerable<OperationEvent> operationEvents, IOperationFactory<OperationEvent> factory)
@@ -138,17 +138,26 @@ namespace DVL_Sync.Extensions
             if (path == null)
                 path = rootFolder.Name;
 
-            if (rootFolder.OperationEvent != null)
-                yield return RefactorOperationEvent(rootFolder.OperationEvent, true);
+            if (rootFolder.OperationEvents != null)
+                foreach (var opEvent in RefactorOperationEvents(rootFolder.OperationEvents, true))
+                    yield return opEvent;
 
             foreach (var file in rootFolder.Files)
-                yield return RefactorOperationEvent(file.OperationEvent);
+                foreach (var opEvent in RefactorOperationEvents(file.OperationEvents))
+                    yield return opEvent;
 
-            if (!(rootFolder.OperationEvent is DeleteOperationEvent))
+            //If there is DeleteOperationEvent and then another operationevents for innerfolders there might be bug
+            if (rootFolder.OperationEvents.Count == 0 || !(rootFolder.OperationEvents.Last() is DeleteOperationEvent))
             {
                 foreach (var folder in rootFolder.Folders)
-                foreach (var opEvent in folder.GetOperationEventsFromRootFolderViewModel(Path.Combine(path, folder.Name)))
-                    yield return opEvent;
+                    foreach (var opEvent in folder.GetOperationEventsFromRootFolderViewModel(Path.Combine(path, folder.Name)))
+                        yield return opEvent;
+            }
+
+            IEnumerable<OperationEvent> RefactorOperationEvents(IEnumerable<OperationEvent> opEvents, bool isRootFolderEvent = false)
+            {
+                foreach (var opEvent in opEvents)
+                    yield return RefactorOperationEvent(opEvent, isRootFolderEvent);
             }
 
             OperationEvent RefactorOperationEvent(OperationEvent opEvent, bool isRootFolderEvent = false)
@@ -185,12 +194,12 @@ namespace DVL_Sync.Extensions
             if (opEvent is RenameOperationEvent renOpEvent)
             {
                 currFolder.Files.RemoveAll(fl => fl.Name == renOpEvent.OldFileName);
-                currFolder.Files.Add(new FileViewModel(fileName) { OperationEvent = opEvent });
+                currFolder.Files.Add(new FileViewModel(fileName).AddOperationEvent(opEvent));
             }
             else
             {
                 if (file == null)
-                    currFolder.Files.Add(new FileViewModel(fileName) { OperationEvent = opEvent });
+                    currFolder.Files.Add(new FileViewModel(fileName).AddOperationEvent(opEvent));
                 else
                 {
                     switch (opEvent)
@@ -200,10 +209,17 @@ namespace DVL_Sync.Extensions
                         //    file.OperationEvent = renOpEvent;
                         //    break;
                         case EditOperationEvent editOpEvent:
-                            file.OperationEvent = editOpEvent;
+                            if (!file.OperationEvents.Any(op => op.EventType == EventType.Create || op.EventType == EventType.Edit))
+                                file.AddOperationEvent(editOpEvent);
                             break;
                         case DeleteOperationEvent deleteOpEvent:
-                            file.OperationEvent = deleteOpEvent;
+                            if (file.OperationEvents.Any(op => op.EventType == EventType.Create))
+                                file.OperationEvents = new List<OperationEvent>();
+                            else
+                            {
+                                file.OperationEvents = new List<OperationEvent>();
+                                file.AddOperationEvent(deleteOpEvent);
+                            }
                             break;
                         default: throw new NotImplementedException("CreateOperationEvent not implemented");
                     }
@@ -242,14 +258,15 @@ namespace DVL_Sync.Extensions
                 if (oldFolder != null)
                 {
                     oldFolder.Name = folderName;
-                    oldFolder.OperationEvent = opEvent;
+                    //oldFolder.OperationEvents = opEvent;
+                    oldFolder.AddOperationEvent(opEvent);
                 }
-                else currFolder.Folders.Add(new FolderViewModel(folderName) { OperationEvent = opEvent });
+                else currFolder.Folders.Add(new FolderViewModel(folderName).AddOperationEvent(opEvent));
             }
             else
             {
                 if (folder == null)
-                    currFolder.Folders.Add(new FolderViewModel(folderName) { OperationEvent = opEvent });
+                    currFolder.Folders.Add(new FolderViewModel(folderName).AddOperationEvent(opEvent));
                 else
                 {
                     switch (opEvent)
@@ -259,7 +276,13 @@ namespace DVL_Sync.Extensions
                         //    folder.OperationEvent = renOpEvent;
                         //    break;
                         case DeleteOperationEvent deleteOpEvent:
-                            folder.OperationEvent = deleteOpEvent;
+                            if (folder.OperationEvents.Any(op => op.EventType == EventType.Create))
+                                folder.OperationEvents = new List<OperationEvent>();
+                            else
+                            {
+                                folder.OperationEvents = new List<OperationEvent>();
+                                folder.AddOperationEvent(deleteOpEvent);
+                            }
                             break;
                         default: throw new NotImplementedException("CreateOperationEvent or EditOperationEvent not implemented");
                     }

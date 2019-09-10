@@ -1,4 +1,5 @@
 ﻿using DVL_Sync_FileEventsLogger.Models;
+using System.Collections.Generic;
 
 namespace DVL_Sync.Models
 {
@@ -9,8 +10,15 @@ namespace DVL_Sync.Models
         public FileViewModel(string name)
         {
             Name = name;
+            OperationEvents = new List<OperationEvent>();
         }
 
-        public OperationEvent OperationEvent { get; set; }
+        public List<OperationEvent> OperationEvents { get; set; }
+
+        public FileViewModel AddOperationEvent(OperationEvent operationEvent)
+        {
+            OperationEvents.Add(operationEvent);
+            return this;
+        }
     }
 }
