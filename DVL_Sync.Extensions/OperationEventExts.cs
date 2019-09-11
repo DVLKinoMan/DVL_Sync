@@ -11,12 +11,12 @@ namespace DVL_Sync.Extensions
 {
     public static class OperationEventExts
     {
-        public class OperationsTree
-        {
-            //public string val { get { return @event.} }
-            public OperationEvent @event { get; set; }
-            public List<OperationsTree> childsTree { get; set; }
-        }
+        //public class OperationsTree
+        //{
+        //    //public string val { get { return @event.} }
+        //    public OperationEvent @event { get; set; }
+        //    public List<OperationsTree> childsTree { get; set; }
+        //}
 
         /// <summary>
         /// 
@@ -142,8 +142,11 @@ namespace DVL_Sync.Extensions
                 foreach (var opEvent in RefactorOperationEvents(rootFolder.OperationEvents, true))
                     yield return opEvent;
 
+            //foreach (var file in rootFolder.Files)
+            //    foreach (var opEvent in RefactorOperationEvents(file.OperationEvents))
+            //        yield return opEvent;
             foreach (var file in rootFolder.Files)
-                foreach (var opEvent in RefactorOperationEvents(file.OperationEvents))
+                foreach (var opEvent in RemoveUnnecessaryOperationEvents(file))
                     yield return opEvent;
 
             //If there is DeleteOperationEvent and then another operationevents for innerfolders there might be bug
@@ -167,6 +170,15 @@ namespace DVL_Sync.Extensions
                 else opEvent.FilePath = path;
 
                 return opEvent;
+            }
+
+            IEnumerable<OperationEvent> RemoveUnnecessaryOperationEvents(FileViewModel fileViewModel)
+            {
+                if (fileViewModel.OperationEvents.Any(op => op.EventType == EventType.Create))
+                    fileViewModel.OperationEvents.RemoveAll(op => op.EventType == EventType.Edit);
+                else  fileViewModel.OperationEvents.RemoveAllExceptLast(op => op.EventType == EventType.Edit, 1);
+
+                return fileViewModel.OperationEvents;
             }
         }
 
@@ -193,8 +205,12 @@ namespace DVL_Sync.Extensions
             var file = currFolder.Files.FirstOrDefault(fl => fl.Name == fileName);
             if (opEvent is RenameOperationEvent renOpEvent)
             {
-                currFolder.Files.RemoveAll(fl => fl.Name == renOpEvent.OldFileName);
-                currFolder.Files.Add(new FileViewModel(fileName).AddOperationEvent(opEvent));
+                //currFolder.Files.RemoveAll(fl => fl.Name == renOpEvent.OldFileName);
+
+                var oldFile = currFolder.Files.FirstOrDefault(fl => fl.Name == renOpEvent.OldFileName);
+                if (oldFile != null)
+                    oldFile.AddOperationEvent(opEvent);
+                else currFolder.Files.Add(new FileViewModel(fileName).AddOperationEvent(opEvent));
             }
             else
             {
@@ -259,7 +275,8 @@ namespace DVL_Sync.Extensions
                 {
                     oldFolder.Name = folderName;
                     //oldFolder.OperationEvents = opEvent;
-                    oldFolder.AddOperationEvent(opEvent);
+                    if (!oldFolder.OperationEvents.Any(op => op.EventType == EventType.Create || op.EventType == EventType.Edit))
+                        oldFolder.AddOperationEvent(opEvent);
                 }
                 else currFolder.Folders.Add(new FolderViewModel(folderName).AddOperationEvent(opEvent));
             }
