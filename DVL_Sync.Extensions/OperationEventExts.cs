@@ -2,7 +2,7 @@
 using DVL_Sync.Models;
 using DVL_Sync_FileEventsLogger.Models;
 using System;
-using System.Collections.Concurrent;
+//using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -151,11 +151,9 @@ namespace DVL_Sync.Extensions
 
             //If there is DeleteOperationEvent and then another operationevents for innerfolders there might be bug
             if (rootFolder.OperationEvents.Count == 0 || !(rootFolder.OperationEvents.Last() is DeleteOperationEvent))
-            {
                 foreach (var folder in rootFolder.Folders)
                     foreach (var opEvent in folder.GetOperationEventsFromRootFolderViewModel(Path.Combine(path, folder.Name)))
                         yield return opEvent;
-            }
 
             IEnumerable<OperationEvent> RefactorOperationEvents(IEnumerable<OperationEvent> opEvents, bool isRootFolderEvent = false)
             {

@@ -28,13 +28,20 @@ namespace DVL_Sync.Implementations
             FilterOperationEvents(folderConfig1List, folderConfig1.FolderPath, folderConfig2List, folderConfig2.FolderPath);
 
             var operationFactory = new OperationFactoryViaOperationEvent(folderConfig1.FolderPath);
-            var ops = folderConfig1List.GetOperations(operationFactory).FilterOperations();
+            var ops = folderConfig1List.GetOperations(operationFactory).FilterOperations().ToList();
             ops.ExecuteAll(folderConfig2.FolderPath);
 
             var operationFactory2 = new OperationFactoryViaOperationEvent(folderConfig2.FolderPath);
             folderConfig2List.GetOperations(operationFactory2).FilterOperations().ExecuteAll(folderConfig2.FolderPath);
         }
 
+        /// <summary>
+        /// Remove unnecessary OperationEvents from both Lists
+        /// </summary>
+        /// <param name="operationEvents1"></param>
+        /// <param name="folderPath1"></param>
+        /// <param name="operationEvents2"></param>
+        /// <param name="folderPath2"></param>
         private static void FilterOperationEvents(List<OperationEvent> operationEvents1, string folderPath1, List<OperationEvent> operationEvents2, string folderPath2)
         {
             var dic = new Dictionary<string, List<OperationEvent>>();
@@ -66,14 +73,12 @@ namespace DVL_Sync.Implementations
         private IEnumerable<(DateTime DateTime, IEnumerable<OperationEvent> OperationEvents)> GetDateTimeAndOperationEventsFromFolderConfig(FolderConfig folderConfig)
         {
             foreach(var filePath in Directory.GetFiles(folderConfig.FolderPath))
-            {
                 if (folderConfig.IsLogFileWithLogName(filePath, Constants.JsonLogFileName))
                 {
                     string fileName = Path.GetFileName(filePath);
                     var dateTime = fileName.GetCustomDateTime();
                     yield return (dateTime, _folderOperationEventsReader.ReadOperationEvents(filePath));
                 }
-            }
         }
     }
 }
