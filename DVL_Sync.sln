@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DVL_Sync.Extensions", "DVL_
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DVL_Sync.Tester", "DVL_Sync.Tester\DVL_Sync.Tester.csproj", "{895E193E-DAA5-4E94-B348-25B74FBBCA96}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DVL_Sync.Processor", "DVL_Sync.Processor\DVL_Sync.Processor.csproj", "{98408BD6-4F22-41AF-8C52-F08313188194}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{895E193E-DAA5-4E94-B348-25B74FBBCA96}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{895E193E-DAA5-4E94-B348-25B74FBBCA96}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{895E193E-DAA5-4E94-B348-25B74FBBCA96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98408BD6-4F22-41AF-8C52-F08313188194}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98408BD6-4F22-41AF-8C52-F08313188194}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98408BD6-4F22-41AF-8C52-F08313188194}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98408BD6-4F22-41AF-8C52-F08313188194}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
