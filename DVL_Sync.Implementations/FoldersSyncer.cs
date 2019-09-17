@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Extensions;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DVL_Sync.Implementations
 {
@@ -35,6 +37,19 @@ namespace DVL_Sync.Implementations
             folderConfig2List.GetOperations(operationFactory2).FilterOperations().ExecuteAll(folderConfig2.FolderPath);
         }
 
+        /// <summary>
+        /// Dummy Async method ???todo
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <param name="folderConfig1"></param>
+        /// <param name="folderConfig2"></param>
+        /// <returns></returns>
+        public async Task SyncFoldersAsync(CancellationToken cancellationToken, FolderConfig folderConfig1, FolderConfig folderConfig2)
+        {
+            SyncFolders(folderConfig1, folderConfig2);
+            await Task.CompletedTask;
+        }
+   
         /// <summary>
         /// Remove unnecessary OperationEvents from both Lists
         /// </summary>
@@ -80,5 +95,5 @@ namespace DVL_Sync.Implementations
                     yield return (dateTime, _folderOperationEventsReader.ReadOperationEvents(filePath));
                 }
         }
-    }
+ }
 }

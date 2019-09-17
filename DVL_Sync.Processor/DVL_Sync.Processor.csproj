@@ -36,9 +36,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AltaSoft.Extensions.RepetitiveTask, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\AltaSoft.Extensions.RepetitiveTask.0.0.1\lib\netstandard2.0\AltaSoft.Extensions.RepetitiveTask.dll</HintPath>
-    </Reference>
+    <Reference Include="DVL_Sync_FileEventsLogger.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.1.0.0-preview9.19421.4\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
@@ -181,9 +179,17 @@
       <Project>{9A5E9299-E852-4BB3-B37E-A068191CA1BB}</Project>
       <Name>DVL_Sync.Abstractions</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DVL_Sync.Extensions\DVL_Sync.Extensions.csproj">
+      <Project>{88549a1f-2399-4f5d-82f1-b0220e6c9621}</Project>
+      <Name>DVL_Sync.Extensions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DVL_Sync.Implementations\DVL_Sync.Implementations.csproj">
       <Project>{4E02978A-23E5-4021-82FA-9C0ADEEBEDC7}</Project>
       <Name>DVL_Sync.Implementations</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DVL_Sync.Models\DVL_Sync.Models.csproj">
+      <Project>{7CDF3BE6-D19B-427E-B9E6-5B4A98F99894}</Project>
+      <Name>DVL_Sync.Models</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

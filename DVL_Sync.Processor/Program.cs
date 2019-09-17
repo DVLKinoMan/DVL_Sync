@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DVL_Sync.Abstractions;
+using DVL_Sync.Extensions;
+using DVL_Sync.Implementations;
+using DVL_Sync.Models;
+//using AltaSoft.Extensions.RepetitiveTask;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Hosting.WindowsServices;
-using DVL_Sync.Abstractions;
-using DVL_Sync.Implementations;
-using AltaSoft.Extensions.RepetitiveTask;
+using System;
+using System.Threading.Tasks;
+using DVL_Sync_FileEventsLogger.Models;
 
 namespace DVL_Sync.Processor
 {
@@ -29,8 +29,16 @@ namespace DVL_Sync.Processor
             services.AddSingleton<IFolderOperationEventsReader, FolderOperationEventsReaderFromJsonFile>()
                     .AddSingleton<IFoldersSyncer, FoldersSyncer>();
 
-            //services.AddHostedRepetitiveTask("Execute",
+            IFoldersSyncer executor;
 
+            //services.AddHostedRepetitiveTask("Execute",
+            using (var sp = services.BuildServiceProvider())
+            {
+                executor = sp.GetRequiredService<IFoldersSyncer>();
+            }
+
+            //Todo???
+            services.AddHostedRepetitiveTask(c => executor.SyncFoldersAsync(c, new FolderConfig(), new FolderConfig()), new RepetitionOptions(arg1.Configuration.GetValue<TimeSpan>("executeInterval")));
 
         }
     }
