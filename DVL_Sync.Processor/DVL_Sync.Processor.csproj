@@ -227,6 +227,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
+    <None Include="SyncFolders.json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DVL_Sync.Abstractions\DVL_Sync.Abstractions.csproj">
