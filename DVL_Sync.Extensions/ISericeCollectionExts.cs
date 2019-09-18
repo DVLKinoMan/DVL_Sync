@@ -16,6 +16,6 @@ namespace DVL_Sync.Extensions
 
         public static IServiceCollection AddHostedRepetitiveTask(this IServiceCollection self, HostedRepetitiveTask rt) =>
                 self.AddSingleton(rt)
-                .AddSingleton<IHostedService>();
+                .AddSingleton<IHostedService>(rt);
     }
 }

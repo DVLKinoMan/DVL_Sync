@@ -18,7 +18,8 @@ namespace DVL_Sync.Tester
         public void TestMethod1()
         {
             var folderOperationEventsReader = new FolderOperationEventsReaderFromJsonFile();
-            var sync = new FoldersSyncer(folderOperationEventsReader);
+            var foldersSyncReader = new FoldersSyncReaderFromJsonFile();
+            var sync = new FoldersSyncer(folderOperationEventsReader, foldersSyncReader);
             var config1 = new FolderConfig
             {
                 FolderPath = folderPath1,
