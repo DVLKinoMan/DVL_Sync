@@ -22,13 +22,31 @@ namespace DVL_Sync.Processor
     {
         internal static Task Main(string[] args)
         {
-            var hostBuilder = Host.CreateDefaultBuilder()
-                                  .ConfigureAppConfiguration(c=>c.AddJsonFile("appSettings.json", false, true).Build())
-                                  .ConfigureServices(ConfigureServices);
+            var logger = new LoggerConfiguration()
+              .MinimumLevel.Debug()
+              .WriteTo.RollingFile(Path.Combine(AppContext.BaseDirectory, "logs\\{Date}.txt"))
+              .WriteTo.Console(theme: AnsiConsoleTheme.Literate)
+              .CreateLogger();
 
-            return Environment.UserInteractive
-                   ? hostBuilder.RunConsoleAsync()
-                   : hostBuilder.UseServiceBaseLifetime().Build().RunAsync();
+            try
+            {
+                var hostBuilder = Host.CreateDefaultBuilder()
+                                      .ConfigureAppConfiguration(c => c.AddJsonFile("appSettings.json", false, true).Build())
+                                      .ConfigureServices(ConfigureServices);
+
+                return Environment.UserInteractive
+                       ? hostBuilder.RunConsoleAsync()
+                       : hostBuilder.UseServiceBaseLifetime().Build().RunAsync();
+            }
+            catch (Exception e)
+            {
+                logger.Fatal(e, "Host terminated unexpectedly");
+                throw;
+            }
+            finally
+            {
+                logger.Dispose();
+            }
         }
 
         private static void ConfigureServices(HostBuilderContext arg1, IServiceCollection services)
