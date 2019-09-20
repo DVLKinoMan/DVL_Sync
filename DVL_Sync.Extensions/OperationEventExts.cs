@@ -28,7 +28,7 @@ namespace DVL_Sync.Extensions
         {
             var filteredOperations = operationEvents
                                                     .Where(opEvent => !(opEvent.EventType == EventType.Edit && opEvent.FileType == FileType.Directory))
-                                                    .OrderBy(opEvent=>opEvent.RaisedTime);
+                                                    .OrderBy(opEvent=>opEvent.RaisedTime).ToList();
 
             if (filteredOperations == null || filteredOperations.Count() <= 1)
                 return filteredOperations;

@@ -73,8 +73,11 @@ namespace DVL_Sync.Processor
                 executor = sp.GetRequiredService<IFoldersSyncer>();
             }
 
-            services.AddHostedRepetitiveTask(c => executor.SyncFoldersAsync(arg1.Configuration.GetValue<string>("syncFoldersPath"), c), 
-                new RepetitionOptions(arg1.Configuration.GetValue<TimeSpan>("executeInterval")));
+            services.AddHostedRepetitiveTask(
+                    cancellationToken => executor.SyncFoldersAsync(arg1.Configuration.GetValue<string>("syncFoldersPath"),
+                                                Path.Combine(Path.GetDirectoryName(arg1.Configuration.GetValue<string>("syncFoldersPath")), "RestorePoint"), 
+                                                cancellationToken),
+                    new RepetitionOptions(arg1.Configuration.GetValue<TimeSpan>("executeInterval")));
 
         }
     }

@@ -1,6 +1,6 @@
 ﻿using DVL_Sync.Abstractions;
 using DVL_Sync.Extensions;
-using DVL_Sync_FileEventsLogger.Implementations;
+//using DVL_Sync_FileEventsLogger.Implementations;
 using DVL_Sync_FileEventsLogger.Models;
 using Microsoft.Extensions.Logging;
 using System;
@@ -26,7 +26,7 @@ namespace DVL_Sync.Implementations
             _logger = logger;
         }
 
-        public void SyncFolders(FolderConfig folderConfig1, FolderConfig folderConfig2)
+        public void SyncFolders(FolderConfig folderConfig1, FolderConfig folderConfig2, string restorePointDirectoryPath)
         {
             var folderConfig1List = GetOperationEventsFromFolderConfig(folderConfig1).SelectMany(t => t.OperationEvents).FilteredOperationEvents().ToList();
             var folderConfig2List = GetOperationEventsFromFolderConfig(folderConfig2).SelectMany(t => t.OperationEvents).FilteredOperationEvents().ToList();
@@ -34,20 +34,45 @@ namespace DVL_Sync.Implementations
             //Remove OperationEvents from both Lists
             FilterOperationEvents(folderConfig1List, folderConfig1.FolderPath, folderConfig2List, folderConfig2.FolderPath);
 
+            if (folderConfig1List.Count == 0 && folderConfig2List.Count == 0)
+                return;
+
+            string restorePointPath = CreateRestorePointDirectory(restorePointDirectoryPath);
+
             var operationFactory = new OperationFactoryViaOperationEvent(folderConfig1.FolderPath);
             folderConfig1List.GetOperations(operationFactory).FilterOperations().ExecuteAll(folderConfig2.FolderPath);
 
             var operationFactory2 = new OperationFactoryViaOperationEvent(folderConfig2.FolderPath);
             folderConfig2List.GetOperations(operationFactory2).FilterOperations().ExecuteAll(folderConfig2.FolderPath);
 
-            _logger.LogDebug($"Successfully synchronized folders: {folderConfig1.FolderPath} and {folderConfig2.FolderPath}");
+            _logger.LogDebug("Successfully synchronized folders: {folderPath1} and {folderPath2}", folderConfig1.FolderPath, folderConfig2.FolderPath);
+
+            CreateRestorePoints(restorePointPath, folderConfig1, folderConfig2);
         }
+
+        private string CreateRestorePointDirectory(string restorePointDirectoryPath)
+        {
+            int i = 1;
+            string dirString = $"{restorePointDirectoryPath} {DateTime.Now.ToString("MM-dd-yyyy")}";
+            while (Directory.Exists($"{dirString} ({i++})"))
+                ;
+            var dir = Directory.CreateDirectory($"{dirString} ({--i})");
+            return dir.FullName;
+        }
+
+        private void CreateRestorePoints(string restorePointDirectoryPath, params FolderConfig[] folderConfigs)
+        {
+            foreach (var folderConfig in folderConfigs)
+                CreateRestorePoint(restorePointDirectoryPath, folderConfig);
+        }
+
+        private void CreateRestorePoint(string restorePointDirectoryPath, FolderConfig folderConfig) => folderConfig.CreateRestorePoint(restorePointDirectoryPath, _logger);
 
         /// <summary>
         /// Sync Folders (It will not work correctly) Todo???
         /// </summary>
         /// <param name="folderConfigs"></param>
-        public void SyncFolders(IEnumerable<FolderConfig> folderConfigs)
+        public void SyncFolders(IEnumerable<FolderConfig> folderConfigs, string restorePointDirectoryPath)
         {
             var configs = folderConfigs.ToList();
             if (configs.Count <= 1)
@@ -56,7 +81,7 @@ namespace DVL_Sync.Implementations
             var currConfig = configs.First();
             for (int i = 1; i < configs.Count; i++)
             {
-                SyncFolders(currConfig, configs[i]);
+                SyncFolders(currConfig, configs[i], restorePointDirectoryPath);
                 currConfig = configs[i];
             }
         }
@@ -68,10 +93,12 @@ namespace DVL_Sync.Implementations
         /// <param name="folderConfig1"></param>
         /// <param name="folderConfig2"></param>
         /// <returns></returns>
-        public async Task SyncFoldersAsync(string syncFoldersPath, CancellationToken cancellationToken)
+        public async Task SyncFoldersAsync(string syncFoldersPath, string restorePointDirectoryPath, CancellationToken cancellationToken)
         {
+            _logger.LogDebug("Searching files to sync");
+
             foreach (var foldersSyncConfig in _foldersSyncReader.ReadFoldersSyncConfigs(syncFoldersPath))
-                SyncFolders(foldersSyncConfig.FolderConfigs);
+                SyncFolders(foldersSyncConfig.FolderConfigs, restorePointDirectoryPath);
             await Task.CompletedTask;
         }
 
@@ -84,7 +111,10 @@ namespace DVL_Sync.Implementations
         /// <param name="folderPath2"></param>
         private void FilterOperationEvents(List<OperationEvent> operationEvents1, string folderPath1, List<OperationEvent> operationEvents2, string folderPath2)
         {
-            _logger.LogDebug($"Filtering OperationEvents for folders: {folderPath1} and {folderPath2}");
+            if (operationEvents1.Count == 0 && operationEvents2.Count == 0)
+                return;
+
+            _logger.LogDebug("Filtering OperationEvents for folders: {folderPath1} and {folderPath2}",folderPath1, folderPath2);
 
             var dic = new Dictionary<string, List<OperationEvent>>();
 
@@ -111,18 +141,22 @@ namespace DVL_Sync.Implementations
             operationEvents1.RemoveAll(op => !neededOpEvents.Contains(op));
             operationEvents2.RemoveAll(op => !neededOpEvents.Contains(op));
         }
-
+      
         private IEnumerable<(DateTime DateTime, IEnumerable<OperationEvent> OperationEvents)> GetOperationEventsFromFolderConfig(FolderConfig folderConfig)
         {
-            _logger.LogDebug($"Getting OperationEvents from folder {folderConfig.FolderPath}");
+            bool isFirstTime = true;
 
-            foreach (var filePath in Directory.GetFiles(folderConfig.FolderPath))
-                if (folderConfig.IsLogFileWithLogName(filePath, Constants.JsonLogFileName))
+            foreach (var filePath in folderConfig.GetFolderConfigJsonLogs())
+            {
+                if (isFirstTime)
                 {
-                    string fileName = Path.GetFileName(filePath);
-                    var dateTime = fileName.GetCustomDateTime();
-                    yield return (dateTime, _folderOperationEventsReader.ReadOperationEvents(filePath));
+                    _logger.LogDebug("Getting OperationEvents from folder {folderPath}", folderConfig.FolderPath);
+                    isFirstTime = false;
                 }
+                string fileName = Path.GetFileName(filePath);
+                var dateTime = fileName.GetCustomDateTime();
+                yield return (dateTime, _folderOperationEventsReader.ReadOperationEvents(filePath));
+            }
         }
     }
 }

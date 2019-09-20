@@ -6,7 +6,7 @@ namespace DVL_Sync.Abstractions
 {
     public interface IFoldersSyncer
     {
-        void SyncFolders(FolderConfig folderConfig1, FolderConfig folderConfig2);
-        Task SyncFoldersAsync(string syncFoldersPath, CancellationToken cancellationToken);
+        void SyncFolders(FolderConfig folderConfig1, FolderConfig folderConfig2, string restorePointDirectoryPath);
+        Task SyncFoldersAsync(string syncFoldersPath, string restorePointDirectoryPath, CancellationToken cancellationToken);
     }
 }

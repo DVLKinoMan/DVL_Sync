@@ -14,6 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="DVL_Sync_FileEventsLogger.Implementations">
+      <HintPath>..\..\DVL_Sync_FileEventsLogger\DVL_Sync_FileEventsLogger.Implementations\bin\Debug\netstandard2.0\DVL_Sync_FileEventsLogger.Implementations.dll</HintPath>
+    </Reference>
     <Reference Include="DVL_Sync_FileEventsLogger.Models">
       <HintPath>..\..\DVL_Sync_FileEventsLogger\DVL_Sync_FileEventsLogger.Models\bin\Debug\netstandard2.0\DVL_Sync_FileEventsLogger.Models.dll</HintPath>
     </Reference>
