@@ -207,7 +207,10 @@ namespace DVL_Sync.Extensions
 
                 var oldFile = currFolder.Files.FirstOrDefault(fl => fl.Name == renOpEvent.OldFileName);
                 if (oldFile != null)
-                    oldFile.AddOperationEvent(opEvent);
+                {
+                    //oldFile.AddOperationEvent(opEvent);
+                    oldFile.Name = renOpEvent.FileName;
+                }
                 else currFolder.Files.Add(new FileViewModel(fileName).AddOperationEvent(opEvent));
             }
             else

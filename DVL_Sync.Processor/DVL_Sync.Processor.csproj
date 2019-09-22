@@ -222,6 +222,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="09.22.2019 6h 05min 39s PM - JsonLogFile.json" />
     <None Include="App.config" />
     <None Include="appSettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -246,6 +247,11 @@
       <Project>{7CDF3BE6-D19B-427E-B9E6-5B4A98F99894}</Project>
       <Name>DVL_Sync.Models</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="New folder\Rename first folder\Renamed folder\Create new Text document inside future renamed folder.txt" />
+    <Content Include="New folder\Rename first folder\Renamed folder\New Text Document.txt" />
+    <Content Include="New folder\Rename first folder\Some Text document.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
