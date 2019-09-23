@@ -97,8 +97,15 @@ namespace DVL_Sync.Implementations
         {
             _logger.LogDebug("Searching files to sync");
 
-            foreach (var foldersSyncConfig in _foldersSyncReader.ReadFoldersSyncConfigs(syncFoldersPath))
-                SyncFolders(foldersSyncConfig.FolderConfigs, restorePointDirectoryPath);
+            try
+            {
+                foreach (var foldersSyncConfig in _foldersSyncReader.ReadFoldersSyncConfigs(syncFoldersPath))
+                    SyncFolders(foldersSyncConfig.FolderConfigs, restorePointDirectoryPath);
+            }
+            catch(Exception exc)
+            {
+                _logger.LogError(exc, $"Unhandeled Exception when syncing");
+            }
             await Task.CompletedTask;
         }
 
