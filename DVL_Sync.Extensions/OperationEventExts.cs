@@ -4,6 +4,7 @@ using DVL_Sync_FileEventsLogger.Models;
 using System;
 //using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Extensions;
 using System.IO;
 using System.Linq;
 
@@ -210,6 +211,12 @@ namespace DVL_Sync.Extensions
                 {
                     //oldFile.AddOperationEvent(opEvent);
                     oldFile.Name = renOpEvent.FileName;
+                    if (oldFile.OperationEvents.Count != 0)
+                    {
+                        foreach (var op in oldFile.OperationEvents)
+                            op.FilePath = op.FilePath.Substring(0, op.FilePath.Length - op.FileName.Length) + renOpEvent.FileName;
+                    }
+                    else oldFile.AddOperationEvent(opEvent);
                 }
                 else currFolder.Files.Add(new FileViewModel(fileName).AddOperationEvent(opEvent));
             }
