@@ -20,7 +20,7 @@ namespace DVL_Sync.Models
         /// Create Directory in folderPath
         /// </summary>
         /// <param name="folderPath"></param>
-        public override void Execute(string folderPath) => Directory.CreateDirectory(Path.Combine(folderPath, DirectoryPathFromRoot));
+        public override void Execute(string folderPath) => File.SetAttributes(Directory.CreateDirectory(Path.Combine(folderPath, DirectoryPathFromRoot)).FullName, FileAttributes.ReadOnly);
 
         public override int GetHashCode() => DirectoryPathFromRoot.GetHashCode();
     }
@@ -47,7 +47,11 @@ namespace DVL_Sync.Models
         /// Copys File to folderPath
         /// </summary>
         /// <param name="folderPath"></param>
-        public override void Execute(string folderPath) => SystemIOFile.Copy(FilePathToCopy, Path.Combine(folderPath, FilePathFromRoot), true);
+        public override void Execute(string folderPath)
+        {
+            SystemIOFile.Copy(FilePathToCopy, Path.Combine(folderPath, FilePathFromRoot), true);
+            SystemIOFile.SetAttributes(Path.Combine(folderPath, FilePathFromRoot), FileAttributes.ReadOnly);
+        }
 
         public override bool Equals(object obj) => obj is CopyOperation copyOp && 
             copyOp.FilePathFromRoot == this.FilePathFromRoot && 
@@ -65,7 +69,11 @@ namespace DVL_Sync.Models
         /// Renames File which is in folderPath directory
         /// </summary>
         /// <param name="folderPath"></param>
-        public override void Execute(string folderPath) => SystemIOFile.Move(Path.Combine(folderPath, FilePathFromRoot), NewName);
+        public override void Execute(string folderPath)
+        {
+            SystemIOFile.Move(Path.Combine(folderPath, FilePathFromRoot), NewName);
+            SystemIOFile.SetAttributes(Path.Combine(Path.GetDirectoryName(Path.Combine(folderPath, FilePathFromRoot)), NewName), FileAttributes.ReadOnly);
+        }
 
         public override bool Equals(object obj) => obj is RenameOperation renameOp &&
             renameOp.FilePathFromRoot == this.FilePathFromRoot &&
