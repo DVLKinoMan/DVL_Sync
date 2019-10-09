@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DVL_Sync.Extensions
 {
-    public static class ISericeCollectionExts
+    public static class IServiceCollectionExts
     {
         public static IServiceCollection AddHostedRepetitiveTask(this IServiceCollection self,
             Func<CancellationToken, Task> repetitiveTask,

@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using SystemIOFile = System.IO.File;
+//using static System.Extensions.SystemExts;
 
 namespace DVL_Sync.Models
 {
@@ -20,7 +21,8 @@ namespace DVL_Sync.Models
         /// Create Directory in folderPath
         /// </summary>
         /// <param name="folderPath"></param>
-        public override void Execute(string folderPath) => File.SetAttributes(Directory.CreateDirectory(Path.Combine(folderPath, DirectoryPathFromRoot)).FullName, FileAttributes.ReadOnly);
+        public override void Execute(string folderPath) => Directory.CreateDirectory(Path.Combine(folderPath, DirectoryPathFromRoot));//.Attributes = 
+            //SystemIOFile.GetAttributes(Path.Combine(folderPath, DirectoryPathFromRoot)) | FileAttributes.ReadOnly;
 
         public override int GetHashCode() => DirectoryPathFromRoot.GetHashCode();
     }
@@ -33,7 +35,12 @@ namespace DVL_Sync.Models
         /// Deletes File in folderPath which is located from root with FilePathFromRoot
         /// </summary>
         /// <param name="folderPath"></param>
-        public override void Execute(string folderPath) => SystemIOFile.Delete(Path.Combine(folderPath, FilePathFromRoot));
+        public override void Execute(string folderPath)
+        {
+            string path = Path.Combine(folderPath, FilePathFromRoot);
+            if (SystemIOFile.Exists(path))
+                SystemIOFile.Delete(path);
+        }
 
         public override int GetHashCode() => FilePathFromRoot.GetHashCode();
     }
@@ -49,8 +56,8 @@ namespace DVL_Sync.Models
         /// <param name="folderPath"></param>
         public override void Execute(string folderPath)
         {
+            //FilePathToCopy.AddFileAttribute(FileAttributes.ReadOnly);
             SystemIOFile.Copy(FilePathToCopy, Path.Combine(folderPath, FilePathFromRoot), true);
-            SystemIOFile.SetAttributes(Path.Combine(folderPath, FilePathFromRoot), FileAttributes.ReadOnly);
         }
 
         public override bool Equals(object obj) => obj is CopyOperation copyOp && 
@@ -71,8 +78,9 @@ namespace DVL_Sync.Models
         /// <param name="folderPath"></param>
         public override void Execute(string folderPath)
         {
+            //Path.Combine(folderPath, FilePathFromRoot).AddFileAttribute(FileAttributes.ReadOnly);
             SystemIOFile.Move(Path.Combine(folderPath, FilePathFromRoot), NewName);
-            SystemIOFile.SetAttributes(Path.Combine(Path.GetDirectoryName(Path.Combine(folderPath, FilePathFromRoot)), NewName), FileAttributes.ReadOnly);
+            //SystemIOFile.SetAttributes(Path.Combine(Path.GetDirectoryName(Path.Combine(folderPath, FilePathFromRoot)), NewName), FileAttributes.ReadOnly);
         }
 
         public override bool Equals(object obj) => obj is RenameOperation renameOp &&
@@ -81,4 +89,5 @@ namespace DVL_Sync.Models
 
         public override int GetHashCode() => FilePathFromRoot.GetHashCode() + NewName.GetHashCode();
     }
+
 }

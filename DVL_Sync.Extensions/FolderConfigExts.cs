@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Extensions;
 using System.IO;
+using System.Threading;
 
 namespace DVL_Sync.Extensions
 {
@@ -17,12 +18,23 @@ namespace DVL_Sync.Extensions
                     yield return filePath;
         }
 
+        /// <summary>
+        /// Working on json files only
+        /// </summary>
+        /// <param name="folderConfig"></param>
+        /// <param name="restorePointDirectoryPath"></param>
+        /// <param name="logger"></param>
         public static void CreateRestorePoint(this FolderConfig folderConfig, string restorePointDirectoryPath, ILogger logger)
         {
             logger.LogDebug("Creating restore point for {folderConfig}", folderConfig.FolderPath);
             foreach (var filePath in folderConfig.GetFolderConfigJsonLogs())
             {
-                File.Copy(filePath, Path.Combine(restorePointDirectoryPath, Path.GetFileName(filePath)));
+                string path = Path.Combine(restorePointDirectoryPath, Path.GetFileName(filePath));
+                string destinationFilePath = path.Substring(0, path.Length - 5);
+                int i = 1;
+                while (File.Exists($"{ destinationFilePath }.json"))
+                    destinationFilePath = $"{ path } { i++ }";
+                File.Copy(filePath, $"{ destinationFilePath }.json");
                 logger.LogDebug("Copyed {filePath} to {restorePointDirectoryPath}", filePath, restorePointDirectoryPath);
             }
             folderConfig.RemoveJsonLogContents();
@@ -31,12 +43,18 @@ namespace DVL_Sync.Extensions
 
         public static void RemoveJsonLogs(this FolderConfig folderConfig)
         {
+            Thread.Sleep(1000);
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
             foreach (var filePath in folderConfig.GetFolderConfigJsonLogs())
                 File.Delete(filePath);
         }
 
         public static void RemoveJsonLogContents(this FolderConfig folderConfig)
         {
+            Thread.Sleep(1000);
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
             foreach (var filePath in folderConfig.GetFolderConfigJsonLogs())
             {
                 if (Path.GetFileName(filePath).GetCustomDateTime() < DateTime.Now.Date)
