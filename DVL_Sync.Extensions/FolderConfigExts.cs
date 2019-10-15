@@ -5,18 +5,16 @@ using System;
 using System.Collections.Generic;
 using System.Extensions;
 using System.IO;
+using System.Linq;
 using System.Threading;
 
 namespace DVL_Sync.Extensions
 {
     public static class FolderConfigExts
     {
-        public static IEnumerable<string> GetFolderConfigJsonLogs(this FolderConfig folderConfig)
-        {
-            foreach (var filePath in Directory.GetFiles(folderConfig.FolderPath))
-                if (folderConfig.IsLogFileWithLogName(filePath, Constants.JsonLogFileName))
-                    yield return filePath;
-        }
+        public static IEnumerable<string> GetFolderConfigJsonLogs(this FolderConfig folderConfig) =>
+            Directory.GetFiles(folderConfig.FolderPath).Where(filePath =>
+                folderConfig.IsLogFileWithLogName(filePath, Constants.JsonLogFileName));
 
         /// <summary>
         /// Working on json files only
@@ -35,7 +33,7 @@ namespace DVL_Sync.Extensions
                 while (File.Exists($"{ destinationFilePath }.json"))
                     destinationFilePath = $"{ path } { i++ }";
                 File.Copy(filePath, $"{ destinationFilePath }.json");
-                logger.LogDebug("Copyed {filePath} to {restorePointDirectoryPath}", filePath, restorePointDirectoryPath);
+                logger.LogDebug("Copied {filePath} to {restorePointDirectoryPath}", filePath, restorePointDirectoryPath);
             }
             folderConfig.RemoveJsonLogContents();
             logger.LogDebug("Removed json log file contents successfully");

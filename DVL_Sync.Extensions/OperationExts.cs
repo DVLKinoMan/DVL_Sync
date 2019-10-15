@@ -48,8 +48,8 @@ namespace DVL_Sync.Extensions
 
     public class OperationEqualityComparer : IEqualityComparer<Operation>
     {
-        private CopyOperationEqualityComparer copyOperationEqualityComparer;
-        private RenameOperationEqualityComparer renameOperationEqualityComparer;
+        private readonly CopyOperationEqualityComparer copyOperationEqualityComparer;
+        private readonly RenameOperationEqualityComparer renameOperationEqualityComparer;
 
         public OperationEqualityComparer()
         {
@@ -59,8 +59,7 @@ namespace DVL_Sync.Extensions
 
         public bool Equals(Operation x, Operation y) => x is CopyOperation copyOp1 && y is CopyOperation copyOp2 ?
                  copyOperationEqualityComparer.Equals(copyOp1, copyOp2) :
-                 (x is RenameOperation renOp1 && y is RenameOperation renOp2 ?
-                  renameOperationEqualityComparer.Equals(renOp1, renOp2) : false);
+                 (x is RenameOperation renOp1 && y is RenameOperation renOp2 && renameOperationEqualityComparer.Equals(renOp1, renOp2));
 
         public int GetHashCode(Operation obj) => obj.GetHashCode();
     }

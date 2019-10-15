@@ -10,13 +10,11 @@ namespace DVL_Sync.Implementations
     {
         public IEnumerable<OperationEvent> ReadOperationEvents(string path)
         {
-            using (var streamReader = new StreamReader(path))
+            using var streamReader = new StreamReader(path);
+            while (!streamReader.EndOfStream)
             {
-                while (!streamReader.EndOfStream)
-                {
-                    string json = streamReader.ReadLine();
-                    yield return JsonConvert.DeserializeObject<OperationEvent>(json);
-                }
+                string json = streamReader.ReadLine();
+                yield return JsonConvert.DeserializeObject<OperationEvent>(json);
             }
         }
     }

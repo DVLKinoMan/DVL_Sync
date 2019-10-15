@@ -12,13 +12,6 @@ namespace DVL_Sync.Extensions
 {
     public static class OperationEventExts
     {
-        //public class OperationsTree
-        //{
-        //    //public string val { get { return @event.} }
-        //    public OperationEvent @event { get; set; }
-        //    public List<OperationsTree> childsTree { get; set; }
-        //}
-
         /// <summary>
         /// 
         /// </summary>
@@ -31,7 +24,7 @@ namespace DVL_Sync.Extensions
                                                     .Where(opEvent => !(opEvent.EventType == EventType.Edit && opEvent.FileType == FileType.Directory))
                                                     .OrderBy(opEvent=>opEvent.RaisedTime).ToList();
 
-            if (filteredOperations == null || filteredOperations.Count() <= 1)
+            if (filteredOperations.Count() <= 1)
                 return filteredOperations;
 
             var rootFolder =  new FolderViewModel(filteredOperations.GetRootPath());
@@ -118,7 +111,7 @@ namespace DVL_Sync.Extensions
         {
             if (operationEvents == null)
                 throw new NullReferenceException("Object reference not set to an instance of an object (operationEvents");
-            if (operationEvents.Count() == 0)
+            if (!operationEvents.Any())
                 throw new InvalidOperationException("Sequence contains no elements");
 
             var splitted = operationEvents.First().FilePath.Split(new[] {"\\"}, StringSplitOptions.None);
@@ -164,9 +157,7 @@ namespace DVL_Sync.Extensions
 
             OperationEvent RefactorOperationEvent(OperationEvent opEvent, bool isRootFolderEvent = false)
             {
-                if (!isRootFolderEvent)
-                    opEvent.FilePath = Path.Combine(path, opEvent.FileName);
-                else opEvent.FilePath = path;
+                opEvent.FilePath = !isRootFolderEvent ? Path.Combine(path, opEvent.FileName) : path;
 
                 return opEvent;
             }

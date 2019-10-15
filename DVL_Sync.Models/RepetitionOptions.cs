@@ -6,9 +6,7 @@ namespace DVL_Sync.Models
     {
         public TimeSpan Interval { get; }
 
-        public RepetitionOptions(TimeSpan interval)
-        {
-            this.Interval = interval;
-        }
+        public RepetitionOptions(TimeSpan interval) => this.Interval = interval;
+
     }
 }

@@ -15,9 +15,9 @@ namespace DVL_Sync.Implementations
 {
     public class FoldersSyncer : IFoldersSyncer
     {
-        private IFolderOperationEventsReader _folderOperationEventsReader;
-        private IFoldersSyncReader _foldersSyncReader;
-        private ILogger<FoldersSyncer> _logger;
+        private readonly IFolderOperationEventsReader _folderOperationEventsReader;
+        private readonly IFoldersSyncReader _foldersSyncReader;
+        private readonly ILogger<FoldersSyncer> _logger;
 
         public FoldersSyncer(IFolderOperationEventsReader folderOperationEventsReader, IFoldersSyncReader foldersSyncReader, ILogger<FoldersSyncer> logger)
         {
@@ -50,7 +50,7 @@ namespace DVL_Sync.Implementations
             CreateRestorePoints(restorePointPath, folderConfig1, folderConfig2);
         }
 
-        private string CreateRestorePointDirectory(string restorePointDirectoryPath)
+        private static string CreateRestorePointDirectory(string restorePointDirectoryPath)
         {
             int i = 1;
             string dirString = $"{restorePointDirectoryPath} {DateTime.Now.ToString("MM-dd-yyyy")}";
@@ -104,7 +104,7 @@ namespace DVL_Sync.Implementations
             }
             catch(Exception exc)
             {
-                _logger.LogError(exc, $"Unhandeled Exception when syncing");
+                _logger.LogError(exc, $"Unhandled Exception when syncing");
             }
             await Task.CompletedTask;
         }

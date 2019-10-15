@@ -1,8 +1,6 @@
-﻿using DVL_Sync.Abstractions;
-using DVL_Sync.Extensions;
-using DVL_Sync.Implementations;
-using DVL_Sync.Models;
-//using AltaSoft.Extensions.RepetitiveTask;
+﻿using System;
+using System.IO;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -10,13 +8,10 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
-using System;
-using System.IO;
-using System.Threading.Tasks;
 
-namespace DVL_Sync.Processor
+namespace DVL_Sync.Processor2
 {
-    internal static class Program
+    class Program
     {
         internal static Task Main(string[] args)
         {
@@ -73,7 +68,7 @@ namespace DVL_Sync.Processor
 
             services.AddHostedRepetitiveTask(
                     cancellationToken => executor.SyncFoldersAsync(arg1.Configuration.GetValue<string>("syncFoldersPath"),
-                                                Path.Combine(Path.GetDirectoryName(arg1.Configuration.GetValue<string>("syncFoldersPath")), "RestorePoint"), 
+                                                Path.Combine(Path.GetDirectoryName(arg1.Configuration.GetValue<string>("syncFoldersPath")), "RestorePoint"),
                                                 cancellationToken),
                     new RepetitionOptions(arg1.Configuration.GetValue<TimeSpan>("executeInterval")));
 

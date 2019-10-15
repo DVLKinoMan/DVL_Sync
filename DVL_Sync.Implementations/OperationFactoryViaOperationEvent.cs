@@ -8,12 +8,10 @@ namespace DVL_Sync.Implementations
 {
     public class OperationFactoryViaOperationEvent : IOperationFactory<OperationEvent>
     {
-        private string _folderRootPath;
+        private readonly string _folderRootPath;
 
-        public OperationFactoryViaOperationEvent(string folderRootPath)
-        {
+        public OperationFactoryViaOperationEvent(string folderRootPath) =>
             _folderRootPath = folderRootPath;
-        }
 
         public Operation CreateOperation(OperationEvent opEvent) => opEvent switch
         {

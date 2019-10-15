@@ -2,7 +2,7 @@
 
 namespace DVL_Sync.Abstractions
 {
-    public interface IOperationFactory<OperationEvent>
+    public interface IOperationFactory<in OperationEvent>
     {
         Operation CreateOperation(OperationEvent opEvent);
     }

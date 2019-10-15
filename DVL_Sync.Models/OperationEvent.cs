@@ -42,17 +42,17 @@ namespace FakeNamespace
 
     public sealed class CreateOperationEvent : OperationEvent
     {
-        public override EventType EventType { get { return EventType.Create; } set { } }
+        public override EventType EventType { get => EventType.Create; set { } }
     }
 
     public sealed class EditOperationEvent : OperationEvent
     {
-        public override EventType EventType { get { return EventType.Edit; } set { } }
+        public override EventType EventType { get => EventType.Edit; set { } }
     }
 
     public sealed class DeleteOperationEvent : OperationEvent
     {
-        public override EventType EventType { get { return EventType.Delete; } set { } }
+        public override EventType EventType { get => EventType.Delete; set { } }
     }
 
     public sealed class RenameOperationEvent : OperationEvent
@@ -60,7 +60,7 @@ namespace FakeNamespace
         public string OldFilePath { get; set; }
         public string OldFileName => Path.GetFileName(OldFilePath);
 
-        public override EventType EventType { get { return EventType.Rename; } set { } }
+        public override EventType EventType { get => EventType.Rename; set { } }
 
         public override string ToString() => $"{base.ToString()} OldFileName: {OldFileName} OldFilePath: {OldFilePath}";
     }
@@ -73,20 +73,14 @@ namespace FakeNamespace
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             var jo = JObject.Load(reader);
-            switch (jo["EventType"].Value<int>())
+            return (jo["EventType"].Value<int>()) switch
             {
-                case 0:
-                    return JsonConvert.DeserializeObject<CreateOperationEvent>(jo.ToString());//, SpecifiedSubclassConversion);
-                case 1:
-                    return JsonConvert.DeserializeObject<EditOperationEvent>(jo.ToString());//, SpecifiedSubclassConversion);
-                case 2:
-                    return JsonConvert.DeserializeObject<DeleteOperationEvent>(jo.ToString());//, SpecifiedSubclassConversion);
-                case 3:
-                    return JsonConvert.DeserializeObject<RenameOperationEvent>(jo.ToString());//, SpecifiedSubclassConversion);
-                default:
-                    throw new Exception();
-            }
-            throw new NotImplementedException();
+                0 => (object)JsonConvert.DeserializeObject<CreateOperationEvent>(jo.ToString()),//, SpecifiedSubclassConversion);
+                1 => JsonConvert.DeserializeObject<EditOperationEvent>(jo.ToString()),//, SpecifiedSubclassConversion);
+                2 => JsonConvert.DeserializeObject<DeleteOperationEvent>(jo.ToString()),//, SpecifiedSubclassConversion);
+                3 => JsonConvert.DeserializeObject<RenameOperationEvent>(jo.ToString()),//, SpecifiedSubclassConversion);
+                _ => throw new NotImplementedException(),
+            };
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) => serializer.Serialize(writer, value, typeof(OperationEvent));

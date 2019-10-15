@@ -10,25 +10,19 @@ namespace DVL_Sync.Models
         private readonly Func<CancellationToken, Task> _func;
         private readonly RepetitionOptions _repetitionOptions;
 
-        public HostedRepetitiveTask(Func<CancellationToken, Task> func, RepetitionOptions repetitionOptions)
-        {
-            this._func = func;
-            this._repetitionOptions = repetitionOptions;
-        }
+        public HostedRepetitiveTask(Func<CancellationToken, Task> func, RepetitionOptions repetitionOptions) =>
+            (this._func, this._repetitionOptions) = (func, repetitionOptions);
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             await Task.CompletedTask;
             while (!cancellationToken.IsCancellationRequested)
             {
-                await Task.Delay(_repetitionOptions.Interval);
+                await Task.Delay(_repetitionOptions.Interval, cancellationToken);
                 await _func(cancellationToken);
             }
         }
 
-        public async Task StopAsync(CancellationToken cancellationToken)
-        {
-            await Task.CompletedTask;
-        }
+        public async Task StopAsync(CancellationToken cancellationToken) => await Task.CompletedTask;
     }
 }

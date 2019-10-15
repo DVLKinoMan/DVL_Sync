@@ -17,28 +17,28 @@ namespace DVL_Sync.Tester
         [TestMethod]
         public void TestMethod1()
         {
-            var folderOperationEventsReader = new FolderOperationEventsReaderFromJsonFile();
-            var foldersSyncReader = new FoldersSyncReaderFromJsonFile();
-            var sync = new FoldersSyncer(folderOperationEventsReader, foldersSyncReader);
-            var config1 = new FolderConfig
-            {
-                FolderPath = folderPath1,
-                IncludeSubDirectories = true,
-                WatchHiddenFiles = false
-            };
-            var config2 = new FolderConfig
-            {
-                FolderPath = folderPath2,
-                IncludeSubDirectories = true,
-                WatchHiddenFiles = false
-            };
+            //var folderOperationEventsReader = new FolderOperationEventsReaderFromJsonFile();
+            //var foldersSyncReader = new FoldersSyncReaderFromJsonFile();
+            //var sync = new FoldersSyncer(folderOperationEventsReader, foldersSyncReader);
+            //var config1 = new FolderConfig
+            //{
+            //    FolderPath = folderPath1,
+            //    IncludeSubDirectories = true,
+            //    WatchHiddenFiles = false
+            //};
+            //var config2 = new FolderConfig
+            //{
+            //    FolderPath = folderPath2,
+            //    IncludeSubDirectories = true,
+            //    WatchHiddenFiles = false
+            //};
 
-            sync.SyncFolders(config1, config2);
+            //sync.SyncFolders(config1, config2);
 
-            var dir1 = new DirectoryInfo(config1.FolderPath);
-            var dir2 = new DirectoryInfo(config2.FolderPath);
+            //var dir1 = new DirectoryInfo(config1.FolderPath);
+            //var dir2 = new DirectoryInfo(config2.FolderPath);
 
-            Assert.AreEqual(true, TwoFoldersAreIdentical(dir1, dir2));
+            //Assert.AreEqual(true, TwoFoldersAreIdentical(dir1, dir2));
         }
 
         public static bool TwoFoldersAreIdentical(DirectoryInfo dir1, DirectoryInfo dir2)
