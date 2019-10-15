@@ -7,11 +7,8 @@ namespace DVL_Sync.Models
     {
         public string Name { get; set; }
 
-        public FileViewModel(string name)
-        {
-            Name = name;
-            OperationEvents = new List<OperationEvent>();
-        }
+        public FileViewModel(string name) =>
+            (Name, OperationEvents) = (name, new List<OperationEvent>());
 
         public List<OperationEvent> OperationEvents { get; set; }
 
