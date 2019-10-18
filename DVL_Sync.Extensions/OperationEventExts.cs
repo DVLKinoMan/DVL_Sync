@@ -84,7 +84,7 @@ namespace DVL_Sync.Extensions
             //        yield return opEvent;
             foreach (var file in rootFolder.Files)
                 foreach (var opEvent in RemoveUnnecessaryOperationEvents(file))
-                    yield return opEvent;
+                    yield return RefactorOperationEvent(opEvent);
 
             //If there is DeleteOperationEvent and then another operationevents for innerfolders there might be bug
             if (rootFolder.OperationEvents.Count == 0 || !(rootFolder.OperationEvents.Last() is DeleteOperationEvent))
